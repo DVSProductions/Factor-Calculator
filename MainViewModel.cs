@@ -1,6 +1,7 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Material.Dialog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -63,6 +64,41 @@ public partial class MainViewModel : ObservableObject {
 
     [RelayCommand]
 	private async Task Calculate() {
+		if (Parts.Select(x => x.ActualPrice).Sum() * Max < Target)
+		{
+			Results.Clear();
+            await DialogHelper.CreateAlertDialog(
+                new AlertDialogBuilderParams()
+                {
+                    ContentHeader = "Zielpreis nicht erreichbar",
+                    WindowTitle = "Berechnungsfehler",
+					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
+					SupportingText=$"Der Zielpreis ist mit den angegebenen Preisen und dem maximalen Faktor nicht erreichbar.\nDer höchste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Max}€",
+                    DialogButtons = [
+                        new DialogButton() {
+                            Content="OK",
+                            IsPositive=true }]
+                }).Show();
+            return;
+        }
+		if(Parts.Select(x => x.ActualPrice).Sum() * Min < Target)
+		{
+			Results.Clear();
+			await DialogHelper.CreateAlertDialog(
+				new AlertDialogBuilderParams()
+				{
+					ContentHeader = "Zielpreis immer erreichbar",
+					WindowTitle = "Berechnungsfehler",
+					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
+					SupportingText=$"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor immer erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}€",
+					DialogButtons = [
+						new DialogButton() {
+							Content="OK",
+							IsPositive=true }]
+				}).Show();
+			return;
+        }
+
 		Results.Clear();
 		IsCalculating = true;
 		Progress = 0;
@@ -120,6 +156,18 @@ public partial class MainViewModel : ObservableObject {
                 VisualizeResult(Results.Last());
 			}
 		});
+		if(Results.Count == 0)
+            await DialogHelper.CreateAlertDialog(
+                new AlertDialogBuilderParams()
+                {
+                    ContentHeader = "Keine Ergebnisse",
+                    DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
+                    SupportingText = $"Es wurde keine exakte Lösung gefunden\nMit erhöhter Fehlertoleranz ist eventuell eine akzeptable Lösung möglich",
+                    DialogButtons = [
+                        new DialogButton() {
+                            Content="OK",
+                            IsPositive=true }]
+                }).Show();
 
     }
 	[RelayCommand]
