@@ -24,8 +24,6 @@ if not defined token (
     echo Token not found in GithubToken.txt.
     exit /b 1
 )
-echo %token%
-pause
 
 dotnet publish -c Release --no-self-contained --arch x64 -f net9.0-windows10.0.17763.0 --output "bin\Velopack" --nologo --property:DebugSymbols=false --property:WarningLevel=0 --property:AnalysisLevel=0 --property:debug=none --property:PublishReadyToRun=false
 
