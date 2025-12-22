@@ -79,14 +79,14 @@ public partial class MainViewModel : ObservableObject {
 				}).Show();
 			return;
 		}
-		if(Parts.Select(x => x.ActualPrice).Sum() * Min < Target) {
+		if(Parts.Select(x => x.ActualPrice).Sum() * Min > Target) {
 			Results.Clear();
 			await DialogHelper.CreateAlertDialog(
 				new AlertDialogBuilderParams() {
 					ContentHeader = "Zielpreis immer erreichbar",
 					WindowTitle = "Berechnungsfehler",
 					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor immer erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}€",
+					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor nicht erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}€",
 					DialogButtons = [
 						new DialogButton() {
 							Content="OK",
