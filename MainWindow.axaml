@@ -13,13 +13,13 @@
 		IsEnabled="{Binding !Updating}"
 		FontWeight="SemiLight"
 		FontFamily="{DynamicResource RobotoFont}"
-		Title="FactorCalculator">
+		Title="Factor Calculator">
 	<Grid>
 		<Grid RowDefinitions="Auto Auto * Auto" >
 			<Grid RowDefinitions="Auto Auto" Grid.ColumnDefinitions="Auto Auto">
 				<styles:Card Margin="5" CornerRadius="10" Grid.RowSpan="2">
 					<Grid RowDefinitions="Auto * Auto">
-						<Label>Komponenten:</Label>
+						<Label>Komponenten</Label>
 						<ItemsControl Grid.Row="1" ItemsSource="{Binding Parts}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -85,7 +85,7 @@
 			</styles:Card>
 
 
-			<Border Grid.Row="3" Grid.ColumnSpan="2">
+			<Border Grid.Row="3" Grid.ColumnSpan="2" Margin="0,0,0,5">
 				<StackPanel Spacing="5">
 					<ProgressBar Minimum="0" Maximum="1" Classes="transistions" ShowProgressText="True" CornerRadius="5" Margin="5,0" IsVisible="{Binding IsCalculating}" Value="{Binding Progress}"></ProgressBar>
 					<Button HorizontalAlignment="Center" Command="{Binding CalculateCommand}">Berechnen!</Button>
