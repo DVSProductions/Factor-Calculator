@@ -56,6 +56,15 @@
 							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding Min}" wpf:TextFieldAssist.Label="Minimaler Faktor" />
 							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding Max}" wpf:TextFieldAssist.Label="Maximaler Faktor"/>
 							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding StepSize}" wpf:TextFieldAssist.Label="Schrittgr&#x00F6;&#x00DF;e" />
+							<Border BorderBrush="#a7a7a7" BorderThickness="1" CornerRadius="4" Padding="5">
+								<StackPanel Spacing="5">
+									<TextBlock Text="Maximaler Fehler" FontSize="12" />
+									<Grid ColumnDefinitions="* Auto">
+										<Slider Margin="10,5" SmallChange="0.01" LargeChange="0.1" TickFrequency="1" TickPlacement="BottomRight" Minimum="0.01" Maximum="5" Value="{Binding MaximumDistance}"/>
+										<Label Grid.Column="1" Content="{Binding MaximumDistance, StringFormat='{}{0:F2}'}" />
+									</Grid>
+								</StackPanel>
+							</Border>
 						</StackPanel>
 					</StackPanel>
 				</styles:Card>

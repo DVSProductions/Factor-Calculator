@@ -32,6 +32,8 @@ public partial class MainViewModel : ObservableObject {
 
     [ObservableProperty]
 	bool updating;
+	[ObservableProperty]
+	double maximumDistance = 1.0;
 
     Timer previewUpdater = new() {
 		Interval = 100,
@@ -64,15 +66,15 @@ public partial class MainViewModel : ObservableObject {
 		Results.Clear();
 		IsCalculating = true;
 		Progress = 0;
-		int stepCount = this.StepCount;
+		var stepCount = StepCount;
 		IEnumerable<IEnumerable<double>> GetSub(Memory<Part> parts) {
 			if(parts.Length == 1) {
-				for(int n = 0; n < stepCount; n++) {
+				for(var n = 0; n < stepCount; n++) {
 					yield return new[] { Min + StepSize * n };
 				}
 			}
 			else {
-				for(int n = 0; n < stepCount; n++) {
+				for(var n = 0; n < stepCount; n++) {
 					var current = Min + StepSize * n;
 					foreach(var value in GetSub(parts[1..])) {
 						yield return value.Prepend(current);
@@ -81,11 +83,11 @@ public partial class MainViewModel : ObservableObject {
 			}
 		}
 		var arr = Parts.ToArray();
-		var bestV = double.PositiveInfinity;
+		var closestDistance = double.PositiveInfinity;
 		var totalRuns = (int)Math.Pow(StepCount, Parts.Count);
 		var currentRun = 0;
 		void PreviewUpdater_Elapsed(object? sender, ElapsedEventArgs e) {
-			Progress = (double)currentRun / (double)totalRuns;
+			Progress = currentRun / (double)totalRuns;
 			if(Results.Count == 0)
 				return;
 			SelectedResult = Results.Last();
@@ -97,14 +99,14 @@ public partial class MainViewModel : ObservableObject {
 		await Task.Run(() => {
 			foreach(var combo in GetSub(arr.AsMemory())) {
 				currentRun++;
-				var fixedPrecision = combo.Select(x => Math.Round(x,2));
-				var variant = fixedPrecision.Select((x, i) => arr[i].ActualPrice * x).Select(x => Math.Round(x,2));
-				var sum = variant.Sum();
+				var factors = combo.Select(x => Math.Round(x, 2));
+				var adjustedPrices = factors.Select((x, i) => arr[i].ActualPrice * x).Select(x => Math.Round(x,2));
+				var sum = adjustedPrices.Sum();
 				var distance = target - sum;
 				var absDistance = Math.Abs(distance);
-				if(absDistance < bestV && absDistance < 1) {
-					bestV = absDistance;
-					Dispatcher.UIThread.Post(() => Results.Add(new Result([.. fixedPrecision], [.. variant], sum, distance)));
+				if(absDistance < closestDistance && absDistance < maximumDistance) {
+					closestDistance = absDistance;
+					Dispatcher.UIThread.Post(() => Results.Add(new Result([.. factors], [.. adjustedPrices], sum, distance)));
 				}
 			}
 		});
