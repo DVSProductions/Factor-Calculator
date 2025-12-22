@@ -28,6 +28,9 @@ public partial class MainViewModel : ObservableObject {
 	int StepCount => (int)Math.Ceiling((Max - Min) / StepSize);
 
 	[ObservableProperty]
+	int updateProgress;
+
+    [ObservableProperty]
 	bool updating;
 
     Timer previewUpdater = new() {
@@ -53,8 +56,10 @@ public partial class MainViewModel : ObservableObject {
 	double progress;
 	[ObservableProperty]
 	bool isCalculating;
+	[ObservableProperty]
+    bool hasDownloadState;
 
-	[RelayCommand]
+    [RelayCommand]
 	private async Task Calculate() {
 		Results.Clear();
 		IsCalculating = true;

@@ -34,7 +34,7 @@
 											<StackPanel Orientation="Horizontal">
 												<TextBox UseFloatingWatermark="True" Theme="{StaticResource FilledTextBox}" Grid.Column="1" Text="{Binding ActualPrice}"  wpf:TextFieldAssist.Label="Originalpreis">
 													<TextBox.InnerRightContent>
-														<Label  Padding="4"  VerticalAlignment="Center" Margin="0,20,10,0" Content="&#x20Ac;" />
+														<Label  Padding="4"  VerticalAlignment="Center" Margin="0,21,10,0" Content="&#x20Ac;" />
 													</TextBox.InnerRightContent>
 												</TextBox>
 											</StackPanel>
@@ -91,6 +91,12 @@
 					<Button HorizontalAlignment="Center" Command="{Binding CalculateCommand}">Berechnen!</Button>
 				</StackPanel>
 			</Border>
+		</Grid>
+		<Grid IsVisible="{Binding Updating}" Background="#8F000000">
+			<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"  Text="Updating" FontSize="40"/>
+				<ProgressBar Minimum="0" Maximum="100" Value="{Binding UpdateProgress}" IsIndeterminate="{Binding !HasDownloadState}" Width="200" Height="20" Margin="0,20,0,0"/>
+			</StackPanel>
 		</Grid>
 	</Grid>
 </Window>

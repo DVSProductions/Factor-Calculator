@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Threading;
 using System.Threading.Tasks;
 using Velopack;
 using Velopack.Sources;
@@ -26,7 +27,11 @@ public partial class MainWindow : Window
                 return; // no update available
             vm.Updating = true;
             // download new version
-            manager.DownloadUpdates(newVersion);
+            manager.DownloadUpdates(newVersion,(x)=>Dispatcher.UIThread.Post(() =>
+            {
+                vm.HasDownloadState = true;
+                vm.UpdateProgress = x;
+            }));
 
             // install new version and restart app
             manager.ApplyUpdatesAndRestart(newVersion);
