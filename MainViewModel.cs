@@ -136,14 +136,14 @@ public partial class MainViewModel : ObservableObject {
 				var sum = adjustedPrices.Sum();
 				var distance = target - sum;
 				var absDistance = Math.Abs(distance);
-				if(absDistance < closestDistance && absDistance < maximumDistance || absDistance < 0.01) {
+				if(absDistance < closestDistance && absDistance < maximumDistance || absDistance < 0.001) {
 					closestDistance = absDistance;
 					Dispatcher.UIThread.Post(() => Results.Add(new Result([.. factors], [.. adjustedPrices], sum, distance)));
 				}
 			}
 		});
 		if(closestDistance < 0.01) {
-			var selection = Results.Where(x => x.Error > 0.01).ToArray();
+			var selection = Results.Where(x => x.Error >= 0.001).ToArray();
 			Dispatcher.UIThread.Invoke(() => {
 				foreach(var toremove in selection) {
 					Results.Remove(toremove);
