@@ -31,12 +31,12 @@ public partial class MainViewModel : ObservableObject {
 	[ObservableProperty]
 	int updateProgress;
 
-    [ObservableProperty]
+	[ObservableProperty]
 	bool updating;
 	[ObservableProperty]
 	double maximumDistance = 1.0;
 
-    Timer previewUpdater = new() {
+	Timer previewUpdater = new() {
 		Interval = 100,
 		AutoReset = true,
 	};
@@ -60,44 +60,40 @@ public partial class MainViewModel : ObservableObject {
 	[ObservableProperty]
 	bool isCalculating;
 	[ObservableProperty]
-    bool hasDownloadState;
+	bool hasDownloadState;
 
-    [RelayCommand]
+	[RelayCommand]
 	private async Task Calculate() {
-		if (Parts.Select(x => x.ActualPrice).Sum() * Max < Target)
-		{
-			Results.Clear();
-            await DialogHelper.CreateAlertDialog(
-                new AlertDialogBuilderParams()
-                {
-                    ContentHeader = "Zielpreis nicht erreichbar",
-                    WindowTitle = "Berechnungsfehler",
-					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-					SupportingText=$"Der Zielpreis ist mit den angegebenen Preisen und dem maximalen Faktor nicht erreichbar.\nDer höchste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Max}€",
-                    DialogButtons = [
-                        new DialogButton() {
-                            Content="OK",
-                            IsPositive=true }]
-                }).Show();
-            return;
-        }
-		if(Parts.Select(x => x.ActualPrice).Sum() * Min < Target)
-		{
+		if(Parts.Select(x => x.ActualPrice).Sum() * Max < Target) {
 			Results.Clear();
 			await DialogHelper.CreateAlertDialog(
-				new AlertDialogBuilderParams()
-				{
-					ContentHeader = "Zielpreis immer erreichbar",
+				new AlertDialogBuilderParams() {
+					ContentHeader = "Zielpreis nicht erreichbar",
 					WindowTitle = "Berechnungsfehler",
 					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-					SupportingText=$"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor immer erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}€",
+					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem maximalen Faktor nicht erreichbar.\nDer höchste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Max}€",
 					DialogButtons = [
 						new DialogButton() {
 							Content="OK",
 							IsPositive=true }]
 				}).Show();
 			return;
-        }
+		}
+		if(Parts.Select(x => x.ActualPrice).Sum() * Min < Target) {
+			Results.Clear();
+			await DialogHelper.CreateAlertDialog(
+				new AlertDialogBuilderParams() {
+					ContentHeader = "Zielpreis immer erreichbar",
+					WindowTitle = "Berechnungsfehler",
+					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
+					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor immer erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}€",
+					DialogButtons = [
+						new DialogButton() {
+							Content="OK",
+							IsPositive=true }]
+				}).Show();
+			return;
+		}
 
 		Results.Clear();
 		IsCalculating = true;
@@ -136,40 +132,47 @@ public partial class MainViewModel : ObservableObject {
 			foreach(var combo in GetSub(arr.AsMemory())) {
 				currentRun++;
 				var factors = combo.Select(x => Math.Round(x, 2));
-				var adjustedPrices = factors.Select((x, i) => arr[i].ActualPrice * x).Select(x => Math.Round(x,2));
+				var adjustedPrices = factors.Select((x, i) => arr[i].ActualPrice * x).Select(x => Math.Round(x, 2));
 				var sum = adjustedPrices.Sum();
 				var distance = target - sum;
 				var absDistance = Math.Abs(distance);
-				if(absDistance < closestDistance && absDistance < maximumDistance) {
+				if(absDistance < closestDistance && absDistance < maximumDistance || absDistance < 0.01) {
 					closestDistance = absDistance;
 					Dispatcher.UIThread.Post(() => Results.Add(new Result([.. factors], [.. adjustedPrices], sum, distance)));
 				}
 			}
 		});
+		if(closestDistance < 0.01) {
+			var selection = Results.Where(x => x.Error > 0.01).ToArray();
+			Dispatcher.UIThread.Invoke(() => {
+				foreach(var toremove in selection) {
+					Results.Remove(toremove);
+				}
+			});
+		}
 		previewUpdater.Stop();
 		previewUpdater.Elapsed -= PreviewUpdater_Elapsed;
 		PreviewUpdater_Elapsed(null, null!);
 		IsCalculating = false;
-		Dispatcher.UIThread.Post(() =>{
-			if (Results.Count > 0){
-                SelectedResult = Results.Last();
-                VisualizeResult(Results.Last());
+		Dispatcher.UIThread.Post(() => {
+			if(Results.Count > 0) {
+				SelectedResult = Results.Last();
+				VisualizeResult(Results.Last());
 			}
 		});
 		if(Results.Count == 0)
-            await DialogHelper.CreateAlertDialog(
-                new AlertDialogBuilderParams()
-                {
-                    ContentHeader = "Keine Ergebnisse",
-                    DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-                    SupportingText = $"Es wurde keine exakte Lösung gefunden\nMit erhöhter Fehlertoleranz ist eventuell eine akzeptable Lösung möglich",
-                    DialogButtons = [
-                        new DialogButton() {
-                            Content="OK",
-                            IsPositive=true }]
-                }).Show();
+			await DialogHelper.CreateAlertDialog(
+				new AlertDialogBuilderParams() {
+					ContentHeader = "Keine Ergebnisse",
+					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
+					SupportingText = $"Es wurde keine exakte Lösung gefunden\nMit erhöhter Fehlertoleranz ist eventuell eine akzeptable Lösung möglich",
+					DialogButtons = [
+						new DialogButton() {
+							Content="OK",
+							IsPositive=true }]
+				}).Show();
 
-    }
+	}
 	[RelayCommand]
 	private void VisualizeResult(Result bestResult) {
 		for(var i = 0; i < Parts.Count; i++) {
