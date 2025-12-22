@@ -1,31 +1,57 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-  </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaXaml Remove="Releases\**" />
-    <Compile Remove="Releases\**" />
-    <EmbeddedResource Remove="Releases\**" />
-    <None Remove="Releases\**" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+		<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+		<EnableNETAnalyzers>False</EnableNETAnalyzers>
+	</PropertyGroup>
+	<PropertyGroup Label="Avalonia">
+	  <AvaloniaNameGeneratorAttachDevTools>False</AvaloniaNameGeneratorAttachDevTools>
+	  <PackageIcon>Icon.png</PackageIcon>
+	  <PlatformTarget>x64</PlatformTarget>
+	  <Company>DVSProductions</Company>
+	  <Copyright>2025</Copyright>
+	  <PackageProjectUrl>https://github.com/DVSProductions/Factor-Calculator</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/DVSProductions/Factor-Calculator</RepositoryUrl>
+	  <RepositoryType>github</RepositoryType>
+	  <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
+	  <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<AvaloniaXaml Remove="Releases\**" />
+		<Compile Remove="Releases\**" />
+		<EmbeddedResource Remove="Releases\**" />
+		<None Remove="Releases\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.10" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.10" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.10" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.10">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Material.Avalonia" Version="3.13.4" />
-    <PackageReference Include="Material.Icons.Avalonia" Version="2.4.1" />
-    <PackageReference Include="Velopack" Version="0.0.1298" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.3.10" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.10" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.10" />
+		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Material.Avalonia" Version="3.13.4" />
+		<PackageReference Include="Material.Icons.Avalonia" Version="2.4.1" />
+		<PackageReference Include="Velopack" Version="0.0.1298" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AvaloniaResource Include="Assets\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Assets\Icon.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Assets\Icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 </Project>

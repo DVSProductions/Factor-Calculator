@@ -24,7 +24,7 @@ public partial class MainWindow : Window
             var newVersion = manager.CheckForUpdates();
             if (newVersion == null)
                 return; // no update available
-
+            vm.Updating = true;
             // download new version
             manager.DownloadUpdates(newVersion);
 

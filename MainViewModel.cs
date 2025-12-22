@@ -27,7 +27,10 @@ public partial class MainViewModel : ObservableObject {
 	double stepSize = 0.01;
 	int StepCount => (int)Math.Ceiling((Max - Min) / StepSize);
 
-	Timer previewUpdater = new() {
+	[ObservableProperty]
+	bool updating;
+
+    Timer previewUpdater = new() {
 		Interval = 100,
 		AutoReset = true,
 	};

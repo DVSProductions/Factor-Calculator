@@ -10,6 +10,9 @@
 		xmlns:styles="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
 		x:Class="FactorCalculator.MainWindow"
 		x:DataType="{x:Type local:MainViewModel}"
+		IsEnabled="{Binding !Updating}"
+		FontWeight="SemiLight"
+		FontFamily="{DynamicResource RobotoFont}"
 		Title="FactorCalculator">
 	<Grid>
 		<Grid RowDefinitions="Auto Auto * Auto" >
