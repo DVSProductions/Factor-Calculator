@@ -25,7 +25,7 @@ if not defined token (
     exit /b 1
 )
 
-dotnet publish -c Release --no-self-contained --arch x64 -f net9.0-windows10.0.17763.0 --output "bin\Velopack" --nologo --property:DebugSymbols=false --property:WarningLevel=0 --property:AnalysisLevel=0 --property:debug=none --property:PublishReadyToRun=false
+dotnet publish "FactorCalculator.csproj" -c Release --no-self-contained --arch x64 -f net9.0-windows10.0.17763.0 --output "bin\Velopack" --nologo --property:DebugSymbols=false --property:WarningLevel=0 --property:AnalysisLevel=0 --property:debug=none --property:PublishReadyToRun=false
 
 vpk pack --packVersion %version% --packTitle "Factor Calculator" --packId "DVSProductions.Factor-Calculator" --packAuthors "DVSProductions" --mainExe FactorCalculator.exe --noPortable --packDir "bin\Velopack" --icon "Assets\Icon.ico"
 
