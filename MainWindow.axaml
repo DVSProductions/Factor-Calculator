@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="using:FactorCalculator"
+		mc:Ignorable="d" d:DesignHeight="500"
+		xmlns:wpf="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+		SizeToContent="Width"
+		xmlns:styles="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+		x:Class="FactorCalculator.MainWindow"
+		x:DataType="{x:Type local:MainViewModel}"
+		Title="FactorCalculator">
+	<Grid>
+		<Grid RowDefinitions="Auto Auto * Auto" >
+			<Grid RowDefinitions="Auto Auto" Grid.ColumnDefinitions="Auto Auto">
+				<styles:Card Margin="5" CornerRadius="10" Grid.RowSpan="2">
+					<Grid RowDefinitions="Auto * Auto">
+						<Label>Komponenten:</Label>
+						<ItemsControl Grid.Row="1" ItemsSource="{Binding Parts}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Spacing="5"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<styles:Card CornerRadius="10" Margin="2.5">
+										<Grid Grid.ColumnDefinitions="Auto *">
+											<StackPanel Orientation="Horizontal">
+												<TextBox UseFloatingWatermark="True" Theme="{StaticResource FilledTextBox}" Grid.Column="1" Text="{Binding ActualPrice}"  wpf:TextFieldAssist.Label="Originalpreis">
+													<TextBox.InnerRightContent>
+														<Label  Padding="4"  VerticalAlignment="Center" Margin="0,20,10,0" Content="&#x20Ac;" />
+													</TextBox.InnerRightContent>
+												</TextBox>
+											</StackPanel>
+											<Label HorizontalAlignment="Right" Grid.Column="1" Content="{Binding Factor,StringFormat=x{0}}" VerticalContentAlignment="Center"/>
+										</Grid>
+									</styles:Card >
+								</DataTemplate>
+
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<Button Grid.Row="2" HorizontalAlignment="Left" Margin="0,10,0,0" Command="{Binding AddComponentCommand}">+</Button>
+						<Button Grid.Row="2" HorizontalAlignment="Right" Margin="0,10,0,0" Command="{Binding RemoveComponentCommand}">-</Button>
+					</Grid>
+				</styles:Card>
+				<styles:Card Grid.Column="1" Grid.Row="0" CornerRadius="10" Margin="5" >
+					<StackPanel>
+						<Label>Einstellungen</Label>
+						<StackPanel Spacing="5">
+							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding Min}" wpf:TextFieldAssist.Label="Minimaler Faktor" />
+							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding Max}" wpf:TextFieldAssist.Label="Maximaler Faktor"/>
+							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding StepSize}" wpf:TextFieldAssist.Label="Schrittgr&#x00F6;&#x00DF;e" />
+						</StackPanel>
+					</StackPanel>
+				</styles:Card>
+				<styles:Card Grid.Column="1" Grid.Row="1" CornerRadius="10" Margin="5">
+
+					<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding Target}" wpf:TextFieldAssist.Label="Ziel" >
+						<TextBox.InnerRightContent>
+							<Label  Padding="4"  VerticalAlignment="Center" Margin="0,00,10,0" Content="&#x20Ac;" />
+						</TextBox.InnerRightContent>
+					</TextBox>
+
+				</styles:Card>
+
+			</Grid>
+
+			<styles:Card Grid.Row="2" Grid.ColumnSpan="2" CornerRadius="10" Margin="5" BorderThickness="1" Padding="10">
+				<Grid Grid.RowDefinitions="Auto *">
+					<Label>Ergebnisse</Label>
+					<ListBox Grid.Row="1" AutoScrollToSelectedItem="True" ItemsSource="{Binding Results}" SelectionChanged="ListBox_SelectionChanged" SelectedItem="{Binding SelectedResult}">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<Label Content="{Binding Total}"/>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</Grid>
+			</styles:Card>
+
+
+			<Border Grid.Row="3" Grid.ColumnSpan="2">
+				<StackPanel Spacing="5">
+					<ProgressBar Minimum="0" Maximum="1" Classes="transistions" ShowProgressText="True" CornerRadius="5" Margin="5,0" IsVisible="{Binding IsCalculating}" Value="{Binding Progress}"></ProgressBar>
+					<Button HorizontalAlignment="Center" Command="{Binding CalculateCommand}">Berechnen!</Button>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</Grid>
+</Window>
