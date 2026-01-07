@@ -27,6 +27,8 @@
 		<Compile Remove="Releases\**" />
 		<EmbeddedResource Remove="Releases\**" />
 		<None Remove="Releases\**" />
+		<Compile Remove="FactorCalculator.Tests\**" />
+		<None Remove="FactorCalculator.Tests\**" />
 	</ItemGroup>
 
 	<ItemGroup>
