@@ -36,6 +36,11 @@ public partial class MainViewModel : ObservableObject {
 	[ObservableProperty]
 	double maximumDistance = 1.0;
 
+	[ObservableProperty]
+	CalculationAlgorithm selectedAlgorithm = CalculationAlgorithm.MeetInTheMiddle;
+
+	public CalculationAlgorithm[] AlgorithmOptions => Enum.GetValues<CalculationAlgorithm>();
+
 	Timer previewUpdater = new() {
 		Interval = 100,
 		AutoReset = true,
@@ -71,7 +76,7 @@ public partial class MainViewModel : ObservableObject {
 					ContentHeader = "Zielpreis nicht erreichbar",
 					WindowTitle = "Berechnungsfehler",
 					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem maximalen Faktor nicht erreichbar.\nDer höchste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Max}€",
+					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem maximalen Faktor nicht erreichbar.\nDer hï¿½chste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Max}ï¿½",
 					DialogButtons = [
 						new DialogButton() {
 							Content="OK",
@@ -86,7 +91,7 @@ public partial class MainViewModel : ObservableObject {
 					ContentHeader = "Zielpreis immer erreichbar",
 					WindowTitle = "Berechnungsfehler",
 					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor nicht erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}€",
+					SupportingText = $"Der Zielpreis ist mit den angegebenen Preisen und dem minimalen Faktor nicht erreichbar.\nDer niedrigste erreichbare Wert ist {Parts.Select(x => x.ActualPrice).Sum() * Min}ï¿½",
 					DialogButtons = [
 						new DialogButton() {
 							Content="OK",
@@ -98,58 +103,37 @@ public partial class MainViewModel : ObservableObject {
 		Results.Clear();
 		IsCalculating = true;
 		Progress = 0;
-		var stepCount = StepCount;
-		IEnumerable<IEnumerable<double>> GetSub(Memory<Part> parts) {
-			if(parts.Length == 1) {
-				for(var n = 0; n < stepCount; n++) {
-					yield return new[] { Min + StepSize * n };
-				}
-			}
-			else {
-				for(var n = 0; n < stepCount; n++) {
-					var current = Min + StepSize * n;
-					foreach(var value in GetSub(parts[1..])) {
-						yield return value.Prepend(current);
-					}
-				}
-			}
-		}
-		var arr = Parts.ToArray();
-		var closestDistance = double.PositiveInfinity;
-		var totalRuns = (int)Math.Pow(StepCount, Parts.Count);
-		var currentRun = 0;
+
+		var config = new FactorCalculationService.CalculationConfig(
+			MinFactor: Min,
+			MaxFactor: Max,
+			StepSize: StepSize,
+			Target: Target,
+			MaximumDistance: MaximumDistance,
+			Algorithm: SelectedAlgorithm
+		);
+		var prices = Parts.Select(x => x.ActualPrice).ToArray();
+
 		void PreviewUpdater_Elapsed(object? sender, ElapsedEventArgs e) {
-			Progress = currentRun / (double)totalRuns;
 			if(Results.Count == 0)
 				return;
 			SelectedResult = Results.Last();
-			//VisualizeResult(bestResult);
 		}
 		previewUpdater.Elapsed += PreviewUpdater_Elapsed;
 		previewUpdater.Start();
-		var target = Target;
+
+		List<FactorCalculationService.CalculationResult>? serviceResults = null;
 		await Task.Run(() => {
-			foreach(var combo in GetSub(arr.AsMemory())) {
-				currentRun++;
-				var factors = combo.Select(x => Math.Round(x, 2));
-				var adjustedPrices = factors.Select((x, i) => arr[i].ActualPrice * x).Select(x => Math.Round(x, 2));
-				var sum = adjustedPrices.Sum();
-				var distance = target - sum;
-				var absDistance = Math.Abs(distance);
-				if(absDistance < closestDistance && absDistance < maximumDistance || absDistance < 0.001) {
-					closestDistance = absDistance;
-					Dispatcher.UIThread.Post(() => Results.Add(new Result([.. factors], [.. adjustedPrices], sum, distance)));
-				}
-			}
+			serviceResults = FactorCalculationService.FindBestResults(
+				prices,
+				config,
+				onProgress: progress => Dispatcher.UIThread.Post(() => Progress = progress),
+				onResultFound: result => Dispatcher.UIThread.Post(() =>
+					Results.Add(new Result([.. result.Factors], [.. result.AdjustedPrices], result.Total, result.Error))
+				)
+			);
 		});
-		if(closestDistance < 0.01) {
-			var selection = Results.Where(x => x.Error >= 0.001).ToArray();
-			Dispatcher.UIThread.Invoke(() => {
-				foreach(var toremove in selection) {
-					Results.Remove(toremove);
-				}
-			});
-		}
+
 		previewUpdater.Stop();
 		previewUpdater.Elapsed -= PreviewUpdater_Elapsed;
 		PreviewUpdater_Elapsed(null, null!);
@@ -165,7 +149,7 @@ public partial class MainViewModel : ObservableObject {
 				new AlertDialogBuilderParams() {
 					ContentHeader = "Keine Ergebnisse",
 					DialogHeaderIcon = Material.Dialog.Icons.DialogIconKind.Error,
-					SupportingText = $"Es wurde keine exakte Lösung gefunden\nMit erhöhter Fehlertoleranz ist eventuell eine akzeptable Lösung möglich",
+					SupportingText = $"Es wurde keine exakte Lï¿½sung gefunden\nMit erhï¿½hter Fehlertoleranz ist eventuell eine akzeptable Lï¿½sung mï¿½glich",
 					DialogButtons = [
 						new DialogButton() {
 							Content="OK",

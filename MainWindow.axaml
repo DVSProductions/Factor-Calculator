@@ -61,6 +61,21 @@
 							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding Max}" wpf:TextFieldAssist.Label="Maximaler Faktor"/>
 							<TextBox UseFloatingWatermark="True" Classes="outline" Grid.Column="1" Text="{Binding StepSize}" wpf:TextFieldAssist.Label="Schrittgr&#x00F6;&#x00DF;e" />
 							<Border BorderBrush="#a7a7a7" BorderThickness="1" CornerRadius="4" Padding="5">
+								<Border.Resources>
+									<local:AlgorithmDisplayConverter x:Key="AlgorithmDisplayConverter" />
+								</Border.Resources>
+								<StackPanel Spacing="5">
+									<TextBlock Text="Algorithmus" FontSize="12" />
+									<ComboBox ItemsSource="{Binding AlgorithmOptions}" SelectedItem="{Binding SelectedAlgorithm}" HorizontalAlignment="Stretch">
+										<ComboBox.ItemTemplate>
+											<DataTemplate>
+												<TextBlock Text="{Binding Converter={StaticResource AlgorithmDisplayConverter}}" />
+											</DataTemplate>
+										</ComboBox.ItemTemplate>
+									</ComboBox>
+								</StackPanel>
+							</Border>
+							<Border BorderBrush="#a7a7a7" BorderThickness="1" CornerRadius="4" Padding="5">
 								<StackPanel Spacing="5">
 									<TextBlock Text="Maximaler Fehler" FontSize="12" />
 									<Grid ColumnDefinitions="* Auto">
